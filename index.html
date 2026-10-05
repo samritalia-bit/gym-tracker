@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sam's Gym Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+
+  :root {
+    --bg: #f5f5f7;
+    --bg2: #ffffff;
+    --bg3: #ebebed;
+    --fg: #1a1a1e;
+    --fg2: #6b6b70;
+    --fg3: #9898a0;
+    --accent: #7c3aed;
+    --accent-light: #ede9fe;
+    --accent2: #059669;
+    --accent2-light: #d1fae5;
+    --warn: #d97706;
+    --warn-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --border: rgba(0,0,0,0.08);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f0f12;
+      --bg2: #1c1c22;
+      --bg3: #28282f;
+      --fg: #f0f0f5;
+      --fg2: #a0a0a8;
+      --fg3: #606068;
+      --accent: #a78bfa;
+      --accent-light: #2d1f5e;
+      --accent2: #34d399;
+      --accent2-light: #064e3b;
+      --warn: #fbbf24;
+      --warn-light: #451a03;
+      --red: #f87171;
+      --red-light: #450a0a;
+      --border: rgba(255,255,255,0.07);
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f0f12;
+    --bg2: #1c1c22;
+    --bg3: #28282f;
+    --fg: #f0f0f5;
+    --fg2: #a0a0a8;
+    --fg3: #606068;
+    --accent: #a78bfa;
+    --accent-light: #2d1f5e;
+    --accent2: #34d399;
+    --accent2-light: #064e3b;
+    --warn: #fbbf24;
+    --warn-light: #451a03;
+    --red: #f87171;
+    --red-light: #450a0a;
+    --border: rgba(255,255,255,0.07);
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    height: 100%;
+  }
+  body {
+    margin: 0;
+    min-height: 100%;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ââ Header ââ */
+  .hdr {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 20px;
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+  }
+  .hdr-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .hdr-title {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+  .hdr-title span { color: var(--accent); }
+
+  .week-strip {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .week-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .week-badge.strength  { background: var(--accent-light);  color: var(--accent); }
+  .week-badge.hypertrophy { background: var(--accent2-light); color: var(--accent2); }
+  .week-badge.volume    { background: var(--warn-light);    color: var(--warn); }
+  .week-badge.deload    { background: var(--red-light);     color: var(--red); }
+  .week-badge.test      { background: var(--bg3);            color: var(--fg); }
+  .week-num {
+    font-size: 12px;
+    color: var(--fg2);
+    font-variant-numeric: tabular-nums;
+  }
+  .date-label {
+    font-size: 12px;
+    color: var(--fg3);
+    margin-left: auto;
+  }
+
+  /* ââ Day tabs ââ */
+  .day-tabs {
+    display: flex;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex: 1;
+    padding: 10px 6px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    user-select: none;
+  }
+  .day-tab:active { background: var(--bg3); }
+  .day-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .day-tab .day-name { display: block; font-size: 11px; }
+  .day-tab .day-label { display: block; font-size: 13px; }
+
+  /* ââ Main content ââ */
+  .content {
+    flex: 1;
+    padding: 16px 16px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ââ Rest day ââ */
+  .rest-card {
+    background: var(--bg2);
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+  }
+  .rest-card .rest-icon { font-size: 40px; margin-bottom: 12px; }
+  .rest-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .rest-card p { color: var(--fg2); font-size: 14px; }
+
+  /* ââ Session header ââ */
+  .session-hdr {
+    background: var(--bg2);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .session-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .session-icon.push  { background: var(--accent-light); }
+  .session-icon.pull  { background: var(--accent2-light); }
+  .session-icon.legs  { background: var(--warn-light); }
+  .session-icon.arms  { background: var(--red-light); }
+  .session-info h2 { font-size: 17px; font-weight: 700; }
+  .session-info p  { font-size: 12px; color: var(--fg2); margin-top: 2px; }
+
+  /* ââ Progress bar ââ */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--fg2);
+  }
+  .progress-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--bg3);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+  }
+
+  /* ââ Exercise card ââ */
+  .exercise-card {
+    background: var(--bg2);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+  .exercise-hdr {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .exercise-hdr:active { background: var(--bg3); }
+  .ex-num {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--bg3);
+    color: var(--fg2);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-right: 10px;
+  }
+  .ex-main { flex: 1; min-width: 0; }
+  .ex-name { font-size: 15px; font-weight: 600; }
+  .ex-sub  { font-size: 12px; color: var(--fg2); margin-top: 1px; }
+  .ex-check {
+    font-size: 18px;
+    margin-left: 10px;
+    flex-shrink: 0;
+    transition: opacity 0.2s;
+  }
+  .ex-check.done { color: var(--accent2); }
+  .ex-check.partial { color: var(--warn); }
+  .ex-check.empty { color: var(--fg3); opacity: 0.5; }
+
+  .exercise-body {
+    padding: 0 16px 14px;
+  }
+  .sets-header {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 44px;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--fg3);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .set-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr 44px;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .set-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg2);
+  }
+  .set-label small {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--fg3);
+    margin-top: 1px;
+  }
+  .set-input {
+    background: var(--bg3);
+    border: 1.5px solid transparent;
+    border-radius: 9px;
+    padding: 8px 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+    width: 100%;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+  .set-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg2);
+  }
+  .set-input.filled {
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+  .set-tick {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: var(--bg3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.15s, border-color 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .set-tick.done {
+    background: var(--accent2-light);
+    border-color: var(--accent2);
+  }
+  .set-tick:active { transform: scale(0.92); }
+
+  .cue-text {
+    font-size: 12px;
+    color: var(--fg3);
+    padding-top: 6px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* ââ Per-exercise notes ââ */
+  .notes-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--fg2);
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+  }
+  .notes-toggle:active { opacity: 0.6; }
+  .notes-area {
+    margin-top: 8px;
+    width: 100%;
+    background: var(--bg3);
+    border: 1.5px solid transparent;
+    border-radius: 9px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--fg);
+    font-family: inherit;
+    line-height: 1.5;
+    resize: none;
+    min-height: 72px;
+    transition: border-color 0.15s;
+  }
+  .notes-area:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg2);
+  }
+  .notes-area::placeholder { color: var(--fg3); }
+
+  /* ââ Straight sets note ââ */
+  .straight-note {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--warn);
+    background: var(--warn-light);
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+
+  /* ââ Bottom bar ââ */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
+  .btn {
+    flex: 1;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-ghost {
+    background: var(--bg3);
+    color: var(--fg);
+  }
+
+  /* ââ Toast ââ */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--fg);
+    color: var(--bg);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 99;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ââ Week overview ââ */
+  .overview-card {
+    background: var(--bg2);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .overview-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .week-day-cell {
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1.5px solid transparent;
+  }
+  .week-day-cell.active-day {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .week-day-cell .wdc-day { font-size: 11px; color: var(--fg3); font-weight: 600; }
+  .week-day-cell .wdc-name { font-size: 12px; font-weight: 700; color: var(--fg); margin-top: 3px; }
+  .week-day-cell .wdc-done { font-size: 10px; color: var(--fg3); margin-top: 2px; }
+
+  /* ââ Theme toggle ââ */
+  .theme-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bg3);
+    color: var(--fg2);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ââ History view ââ */
+  .history-card {
+    background: var(--bg2);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--card-shadow);
+  }
+  .history-card h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--fg2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+  .history-entry {
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  .history-entry:last-child { border-bottom: none; }
+  .history-entry strong { color: var(--fg); }
+  .history-entry span { color: var(--fg2); }
+
+  .no-session {
+    text-align: center;
+    color: var(--fg3);
+    font-size: 13px;
+    padding: 20px 0;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-title">GYM<span>LOG</span></div>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">âï¸</button>
+    </div>
+    <div class="week-strip">
+      <span id="weekBadge" class="week-badge strength">â¡ Strength</span>
+      <span id="weekNum" class="week-num">Week 1</span>
+      <span id="dateLabel" class="date-label">Mon, 6 Oct</span>
+    </div>
+  </div>
+
+  <div class="day-tabs" id="dayTabs"></div>
+
+  <div class="content" id="content"></div>
+
+  <div class="bottom-bar" id="bottomBar" style="display:none">
+    <button class="btn btn-ghost" id="clearBtn">Clear</button>
+    <button class="btn btn-primary" id="saveBtn">ð¾ Save Session</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ââ Program Data ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+const START_DATE = new Date('2026-10-06T00:00:00'); // Monday 6 Oct 2026
+
+// Week types cycle: Strength, Hypertrophy, Volume, Deload, then repeat (wk 9 = Strength, wk 12 = Test)
+function getWeekType(weekNum) {
+  if (weekNum === 12) return { label: 'Test Week', key: 'test', emoji: 'ð' };
+  if (weekNum === 8)  return { label: 'Deload',    key: 'deload', emoji: 'ð´' };
+  const cycle = (weekNum - 1) % 4;
+  return [
+    { label: 'Strength',    key: 'strength',    emoji: 'â¡' },
+    { label: 'Hypertrophy', key: 'hypertrophy', emoji: 'ðª' },
+    { label: 'Volume',      key: 'volume',       emoji: 'ð¥' },
+    { label: 'Deload',      key: 'deload',       emoji: 'ð´' },
+  ][cycle];
+}
+
+// Pyramid set targets by week type
+function getSets(weekType, base) {
+  const { heavy, mod, light } = base;
+  const deload = weekType === 'deload';
+  const test   = weekType === 'test';
+  if (deload) return [
+    { label: 'Set 1', reps: '5â6',   kg: Math.round(heavy * 0.7), note: 'Deload heavy' },
+    { label: 'Set 2', reps: '8â10',  kg: Math.round(mod * 0.7),   note: 'Deload moderate' },
+    { label: 'Set 3', reps: '15â20', kg: Math.round(light * 0.7), note: 'Deload light' },
+  ];
+  if (test) return [
+    { label: 'Set 1', reps: '1â3', kg: heavy, note: 'Test max â warm up well' },
+  ];
+  const repsMap = {
+    strength:    ['5â6', '8â10', '15â20'],
+    hypertrophy: ['6â8', '10â12', '15â20'],
+    volume:      ['8â10', '12â15', '20â25'],
+  };
+  const [r1, r2, r3] = repsMap[weekType] || repsMap.strength;
+  return [
+    { label: 'Set 1', reps: r1, kg: heavy, note: 'Heavy' },
+    { label: 'Set 2', reps: r2, kg: mod,   note: 'Moderate' },
+    { label: 'Set 3', reps: r3, kg: light,  note: 'Light' },
+  ];
+}
+
+// Straight sets (for abs / accessory)
+function straightSets(reps, kg, count = 3) {
+  return Array.from({ length: count }, (_, i) => ({
+    label: `Set ${i+1}`, reps, kg, note: 'Steady pace'
+  }));
+}
+
+const DAYS = {
+  2: { // Tuesday
+    key: 'push',
+    label: 'Push',
+    emoji: 'ð¼',
+    style: 'push',
+    subtitle: 'Chest Â· Shoulders Â· Triceps',
+    exercises: [
+      {
+        name: 'Chest Press Machine',
+        sub: 'Chest compound',
+        pyramid: true,
+        base: { heavy: 80, mod: 65, light: 50 },
+        cue: 'Elbows tucked 45Â°. Chest-led press. Full range â don\'t bounce off the stack.'
+      },
+      {
+        name: 'Incline DB Press',
+        sub: 'Upper chest',
+        pyramid: true,
+        base: { heavy: 32, mod: 26, light: 20 },
+        cue: '30â45Â° incline. Twist pinkies together at top. Full stretch at bottom.'
+      },
+      {
+        name: 'Cable Lateral Raise (Single Arm)',
+        sub: 'Medial delts',
+        pyramid: true,
+        base: { heavy: 12, mod: 9, light: 6 },
+        cue: 'Lead with elbow not wrist. Pinky slightly higher than thumb. Stop at shoulder height.'
+      },
+      {
+        name: 'Shoulder Press Machine',
+        sub: 'Shoulder compound',
+        pyramid: true,
+        base: { heavy: 60, mod: 50, light: 38 },
+        cue: 'Biceps to ears. Controlled descent. Don\'t rush lockout.'
+      },
+      {
+        name: 'JM Press (Barbell)',
+        sub: 'Triceps long head',
+        pyramid: true,
+        base: { heavy: 40, mod: 32, light: 24 },
+        cue: 'Elbows tucked in. Bar to neckline. Hybrid press/extension â great long head hit.'
+      },
+      {
+        name: 'Seated Barbell Front Raise',
+        sub: 'Anterior delt Â· Upper chest',
+        pyramid: true,
+        base: { heavy: 20, mod: 16, light: 12 },
+        cue: 'Sit upright, barbell in both hands. Drive bar up to shoulder height with a controlled swing. Front delts do the work â let the momentum assist, don\'t muscle it with your back.'
+      },
+    ]
+  },
+  3: { // Wednesday
+    key: 'pull',
+    label: 'Pull',
+    emoji: 'ð½',
+    style: 'pull',
+    subtitle: 'Back Â· Rear Delts Â· Biceps',
+    exercises: [
+      {
+        name: 'Rack Pull (Below Knee)',
+        sub: 'Back compound â heavy',
+        pyramid: true,
+        base: { heavy: 120, mod: 100, light: 80 },
+        cue: 'Brace hard. Push floor away. Drive hips through at lockout. 2 min rest every set â non-negotiable.'
+      },
+      {
+        name: 'Bent Over Row (Barbell)',
+        sub: 'Mid-back Â· Rhomboids',
+        pyramid: true,
+        base: { heavy: 80, mod: 65, light: 50 },
+        cue: 'Overhand grip. Hinge 45Â°. Pull bar to lower chest. Drive elbows back hard. Chest up throughout.'
+      },
+      {
+        name: 'Lat Pulldown (Wide Grip)',
+        sub: 'Lats width',
+        pyramid: true,
+        base: { heavy: 80, mod: 66, light: 52 },
+        cue: 'Lean back slightly, pull bar to upper chest. Drive elbows down and back. Full stretch at top.'
+      },
+      {
+        name: 'Seated Cable Row (V-Grip)',
+        sub: 'Mid-back Â· Traps',
+        pyramid: true,
+        base: { heavy: 72, mod: 60, light: 48 },
+        cue: 'Chest up. Pull to lower abs. Tuck head going forward. Squeeze shoulder blades at peak.'
+      },
+      {
+        name: 'EZ Bar Curl',
+        sub: 'Biceps compound',
+        pyramid: true,
+        base: { heavy: 40, mod: 32, light: 24 },
+        cue: 'Anchor elbows at sides. Full stretch at bottom, squeeze at top. No swinging.'
+      },
+    ]
+  },
+  4: { // Thursday
+    key: 'legs',
+    label: 'Legs+Abs',
+    emoji: 'ð¦µ',
+    style: 'legs',
+    subtitle: 'Quads Â· Hamstrings Â· Glutes Â· Abs',
+    exercises: [
+      {
+        name: 'Squat (Barbell)',
+        sub: 'Legs compound',
+        pyramid: true,
+        base: { heavy: 100, mod: 80, light: 60 },
+        cue: 'Bar on traps, chest up, knees track toes. Depth to parallel. Drive through heels on the way up.'
+      },
+      {
+        name: 'Leg Press',
+        sub: 'Quads compound',
+        pyramid: true,
+        base: { heavy: 240, mod: 180, light: 130 },
+        cue: 'Knee sleeve on. 90Â° depth max every rep. Feet shoulder-width, mid-plate. Don\'t lock out fully.'
+      },
+      {
+        name: 'Leg Extension',
+        sub: 'Quad isolation',
+        pyramid: true,
+        base: { heavy: 80, mod: 65, light: 50 },
+        cue: 'Full extension at top â squeeze quads hard. Slow controlled descent. Isolates quads completely.'
+      },
+      {
+        name: 'Romanian Deadlift (DB)',
+        sub: 'Hamstrings Â· Glutes',
+        pyramid: true,
+        base: { heavy: 32, mod: 26, light: 20 },
+        cue: 'Soft knee bend. Hinge hips back. Feel hamstring stretch all the way down. Squeeze glutes at top.'
+      },
+      {
+        name: 'Leg Curl (Seated)',
+        sub: 'Hamstring isolation',
+        pyramid: true,
+        base: { heavy: 60, mod: 48, light: 36 },
+        cue: 'Pause 1 second at peak contraction. Full extension at bottom every rep. Don\'t let hips rise.'
+      },
+      {
+        name: 'Cable Crunch',
+        sub: 'Abs finisher Â· Straight sets',
+        pyramid: false,
+        straight: { reps: '15â20', kg: 25, count: 3 },
+        cue: 'Rope overhead. Crunch down toward knees. Squeeze abs hard at bottom. Controlled return.'
+      },
+    ]
+  },
+  5: { // Friday
+    key: 'arms',
+    label: 'Arms',
+    emoji: 'ðª',
+    style: 'arms',
+    subtitle: 'Biceps Â· Triceps Â· Forearms',
+    exercises: [
+      {
+        name: 'EZ Bar Curl',
+        sub: 'Biceps â heavy compound',
+        pyramid: true,
+        base: { heavy: 40, mod: 32, light: 24 },
+        cue: 'Anchor elbows at sides. No swinging. Full range every rep. Log weight every session.'
+      },
+      {
+        name: 'Skull Crushers (EZ Bar)',
+        sub: 'Triceps long head',
+        pyramid: true,
+        base: { heavy: 36, mod: 28, light: 20 },
+        cue: 'Bar to forehead. Elbows point at ceiling. Full extension at top. Slow eccentric â don\'t rush.'
+      },
+      {
+        name: 'Incline DB Curl',
+        sub: 'Biceps long head stretch',
+        pyramid: true,
+        base: { heavy: 16, mod: 13, light: 10 },
+        cue: '45Â° incline â arms hang fully. Great long-head stretch at bottom. Twist and squeeze at top.'
+      },
+      {
+        name: 'Rope Pushdown',
+        sub: 'Triceps lateral head',
+        pyramid: true,
+        base: { heavy: 40, mod: 32, light: 22 },
+        cue: 'Rope splits at bottom. Squeeze lateral head hard. Don\'t lean forward. Elbows locked at sides.'
+      },
+      {
+        name: 'Cable Hammer Curl',
+        sub: 'Brachialis Â· Forearms',
+        pyramid: true,
+        base: { heavy: 20, mod: 16, light: 12 },
+        cue: 'Neutral grip. Twist out at bottom, twist in at top. Ring hold lightly. Controlled tempo.'
+      },
+      {
+        name: 'Overhead Tricep Ext (Cable)',
+        sub: 'Triceps long head â finisher',
+        pyramid: true,
+        base: { heavy: 28, mod: 22, light: 16 },
+        cue: 'Arms behind head, elbows locked in. Full extension overhead. Long head gets maximum stretch here.'
+      },
+    ]
+  }
+};
+
+const DAY_ORDER = [2, 3, 4, 5]; // Tue, Wed, Thu, Fri
+
+// ââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+let currentDayIndex = null; // day-of-week 0=Sun..6=Sat
+let currentWeek = 1;
+let weekType = null;
+let logs = {}; // { [dayKey_weekKey]: { [exerciseIndex]: { sets: [{weight,reps,done}] } } }
+let theme = 'system';
+
+// ââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+function today() {
+  const now = new Date();
+  return { dow: now.getDay(), date: now };
+}
+
+function getWeekNumber(date) {
+  const diff = date - START_DATE;
+  const days = Math.floor(diff / 86400000);
+  if (days < 0) return 0; // before program
+  return Math.min(12, Math.floor(days / 7) + 1);
+}
+
+function formatDate(date) {
+  return date.toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function logKey(dayNum, week) {
+  return `day${dayNum}_wk${week}`;
+}
+
+function getLog(dayNum, week, exIdx, setIdx) {
+  const k = logKey(dayNum, week);
+  return (logs[k]?.[exIdx]?.sets?.[setIdx]) || {};
+}
+
+function setLog(dayNum, week, exIdx, setIdx, field, value) {
+  const k = logKey(dayNum, week);
+  if (!logs[k]) logs[k] = {};
+  if (!logs[k][exIdx]) logs[k][exIdx] = { sets: {} };
+  if (!logs[k][exIdx].sets[setIdx]) logs[k][exIdx].sets[setIdx] = {};
+  logs[k][exIdx].sets[setIdx][field] = value;
+  saveToStorage();
+}
+
+function toggleSetDone(dayNum, week, exIdx, setIdx) {
+  const k = logKey(dayNum, week);
+  const cur = logs[k]?.[exIdx]?.sets?.[setIdx]?.done;
+  setLog(dayNum, week, exIdx, setIdx, 'done', !cur);
+}
+
+function clearSessionLog(dayNum, week) {
+  const k = logKey(dayNum, week);
+  delete logs[k];
+  saveToStorage();
+}
+
+function exerciseStatus(dayNum, week, exIdx, totalSets) {
+  let done = 0;
+  for (let i = 0; i < totalSets; i++) {
+    if (logs[logKey(dayNum, week)]?.[exIdx]?.sets?.[i]?.done) done++;
+  }
+  if (done === 0) return 'empty';
+  if (done === totalSets) return 'done';
+  return 'partial';
+}
+
+function sessionProgress(dayNum, week) {
+  const day = DAYS[dayNum];
+  if (!day) return { done: 0, total: 0 };
+  let done = 0, total = 0;
+  day.exercises.forEach((ex, exIdx) => {
+    const sets = getSetsForEx(ex, weekType);
+    total += sets.length;
+    sets.forEach((_, sIdx) => {
+      if (logs[logKey(dayNum, week)]?.[exIdx]?.sets?.[sIdx]?.done) done++;
+    });
+  });
+  return { done, total };
+}
+
+function getSetsForEx(ex, wt) {
+  if (!ex.pyramid) {
+    return straightSets(ex.straight.reps, ex.straight.kg, ex.straight.count);
+  }
+  return getSets(wt, ex.base);
+}
+
+// ââ Persistence âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+function saveToStorage() {
+  try { localStorage.setItem('gymlog_logs', JSON.stringify(logs)); } catch(e) {}
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem('gymlog_logs');
+    if (raw) logs = JSON.parse(raw);
+    const t = localStorage.getItem('gymlog_theme');
+    if (t) theme = t;
+  } catch(e) {}
+}
+
+// ââ Rendering âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+function renderDayTabs() {
+  const tabs = document.getElementById('dayTabs');
+  tabs.innerHTML = '';
+  const { dow } = today();
+
+  DAY_ORDER.forEach(dayNum => {
+    const day = DAYS[dayNum];
+    const tab = document.createElement('div');
+    tab.className = 'day-tab' + (currentDayIndex === dayNum ? ' active' : '');
+
+    // day name (Mon/Tue/Thu/Fri)
+    const dayNames = {2:'Tue',3:'Wed',4:'Thu',5:'Fri'};
+
+    tab.innerHTML = `<span class="day-name">${dayNames[dayNum]}</span><span class="day-label">${day.label}</span>`;
+    tab.addEventListener('click', () => {
+      currentDayIndex = dayNum;
+      renderAll();
+    });
+    tabs.appendChild(tab);
+  });
+
+  // Add a "Rest" tab if today is a rest day and not already visible
+  if (![1,2,4,5].includes(dow)) {
+    const tab = document.createElement('div');
+    tab.className = 'day-tab' + (currentDayIndex === 99 ? ' active' : '');
+    tab.innerHTML = `<span class="day-name">Today</span><span class="day-label">Rest</span>`;
+    tab.addEventListener('click', () => { currentDayIndex = 99; renderAll(); });
+    tabs.insertBefore(tab, tabs.firstChild);
+  }
+}
+
+function renderHeader() {
+  const wt = weekType;
+  const badge = document.getElementById('weekBadge');
+  badge.className = `week-badge ${wt.key}`;
+  badge.textContent = `${wt.emoji} ${wt.label}`;
+  document.getElementById('weekNum').textContent = `Week ${currentWeek}`;
+  document.getElementById('dateLabel').textContent = formatDate(new Date());
+}
+
+function renderContent() {
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+
+  const dayNum = currentDayIndex;
+
+  if (dayNum === 99 || !DAYS[dayNum]) {
+    // Rest day
+    const card = document.createElement('div');
+    card.className = 'rest-card';
+    card.innerHTML = `
+      <div class="rest-icon">ð´</div>
+      <h2>Rest Day</h2>
+      <p>Recovery is where the gains happen. Eat well, sleep well, and come back stronger.</p>
+    `;
+    content.appendChild(card);
+    document.getElementById('bottomBar').style.display = 'none';
+    renderOverview(content);
+    return;
+  }
+
+  const day = DAYS[dayNum];
+
+  // Session header
+  const { done, total } = sessionProgress(dayNum, currentWeek);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const sHdr = document.createElement('div');
+  sHdr.className = 'session-hdr';
+  sHdr.innerHTML = `
+    <div class="session-icon ${day.style}">${day.emoji}</div>
+    <div class="session-info">
+      <h2>${day.label} Day</h2>
+      <p>${day.subtitle}</p>
+    </div>
+  `;
+  content.appendChild(sHdr);
+
+  // Progress
+  const progRow = document.createElement('div');
+  progRow.className = 'progress-row';
+  progRow.innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <span>${done}/${total} sets</span>
+  `;
+  content.appendChild(progRow);
+
+  // Exercises
+  day.exercises.forEach((ex, exIdx) => {
+    const sets = getSetsForEx(ex, weekType.key);
+    const status = exerciseStatus(dayNum, currentWeek, exIdx, sets.length);
+    const checkEmoji = { done: 'â', partial: 'ð¶', empty: 'â¬' }[status];
+
+    const card = document.createElement('div');
+    card.className = 'exercise-card';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'exercise-hdr';
+    hdr.innerHTML = `
+      <div class="ex-num">${exIdx + 1}</div>
+      <div class="ex-main">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-sub">${ex.sub}</div>
+      </div>
+      <div class="ex-check ${status}">${checkEmoji}</div>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'exercise-body';
+
+    if (!ex.pyramid) {
+      body.innerHTML = `<div class="straight-note">Straight Sets</div>`;
+    }
+
+    // Sets table header
+    body.innerHTML += `
+      <div class="sets-header">
+        <div>Set</div>
+        <div>kg</div>
+        <div>Reps</div>
+        <div>â</div>
+      </div>
+    `;
+
+    sets.forEach((set, sIdx) => {
+      const saved = getLog(dayNum, currentWeek, exIdx, sIdx);
+      const isDone = !!saved.done;
+      const wt = saved.weight || '';
+      const reps = saved.reps || '';
+
+      const row = document.createElement('div');
+      row.className = 'set-row';
+      row.innerHTML = `
+        <div class="set-label">${set.label}<small>${set.note}</small></div>
+        <input class="set-input${wt ? ' filled' : ''}" type="number" inputmode="decimal" placeholder="${set.kg}kg" value="${wt}" data-ex="${exIdx}" data-set="${sIdx}" data-field="weight">
+        <input class="set-input${reps ? ' filled' : ''}" type="number" inputmode="numeric" placeholder="${set.reps}" value="${reps}" data-ex="${exIdx}" data-set="${sIdx}" data-field="reps">
+        <div class="set-tick${isDone ? ' done' : ''}" data-ex="${exIdx}" data-set="${sIdx}">${isDone ? 'â' : ''}</div>
+      `;
+      body.appendChild(row);
+    });
+
+    // Cue moved into editable notes field below
+
+    // Per-exercise notes â pre-filled with cue, editable, persisted
+    const savedNote = logs[logKey(dayNum, currentWeek)]?.[exIdx]?.note ?? ex.cue;
+    const hasCustomNote = logs[logKey(dayNum, currentWeek)]?.[exIdx]?.note !== undefined;
+    const notesWrap = document.createElement('div');
+    notesWrap.innerHTML = `
+      <button class="notes-toggle" data-ex="${exIdx}">ð Notes${hasCustomNote && savedNote !== ex.cue ? ' â' : ''}</button>
+      <textarea class="notes-area" data-ex="${exIdx}" placeholder="Add notesâ¦" style="display:none">${savedNote}</textarea>
+    `;
+    body.appendChild(notesWrap);
+
+    card.appendChild(hdr);
+    card.appendChild(body);
+    content.appendChild(card);
+
+    // Toggle body on header click (collapsed by default on small screens is handled via the header click)
+    // Actually keep all expanded â mobile-first full view
+  });
+
+  // Bottom bar
+  document.getElementById('bottomBar').style.display = 'flex';
+
+  // Wire up events
+  content.querySelectorAll('.set-input').forEach(input => {
+    input.addEventListener('change', e => {
+      const { ex, set, field } = e.target.dataset;
+      const val = e.target.value;
+      setLog(dayNum, currentWeek, +ex, +set, field, val);
+      e.target.classList.toggle('filled', !!val);
+      // Auto-update progress
+      const { done, total } = sessionProgress(dayNum, currentWeek);
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      const fill = document.querySelector('.progress-fill');
+      if (fill) fill.style.width = pct + '%';
+      const prog = document.querySelector('.progress-row span');
+      if (prog) prog.textContent = `${done}/${total} sets`;
+    });
+  });
+
+  // Notes toggle + autosave
+  content.querySelectorAll('.notes-toggle').forEach(btn => {
+    const textarea = btn.nextElementSibling;
+    // Show if already has content
+    if (textarea.value) textarea.style.display = '';
+    btn.addEventListener('click', () => {
+      const open = textarea.style.display !== 'none';
+      textarea.style.display = open ? 'none' : '';
+      if (!open) textarea.focus();
+    });
+    textarea.addEventListener('input', e => {
+      const exIdx = +e.target.dataset.ex;
+      const k = logKey(dayNum, currentWeek);
+      if (!logs[k]) logs[k] = {};
+      if (!logs[k][exIdx]) logs[k][exIdx] = { sets: {} };
+      logs[k][exIdx].note = e.target.value;
+      saveToStorage();
+      // Update dot indicator when edited away from default cue
+      const defaultCue = day.exercises[exIdx]?.cue || '';
+      btn.textContent = `ð Notes${e.target.value && e.target.value !== defaultCue ? ' â' : ''}`;
+    });
+  });
+
+  content.querySelectorAll('.set-tick').forEach(tick => {
+    tick.addEventListener('click', e => {
+      const { ex, set } = e.target.dataset;
+      toggleSetDone(dayNum, currentWeek, +ex, +set);
+      const isDone = !!logs[logKey(dayNum, currentWeek)]?.[+ex]?.sets?.[+set]?.done;
+      tick.classList.toggle('done', isDone);
+      tick.textContent = isDone ? 'â' : '';
+      // Update exercise status icon
+      const sets = getSetsForEx(day.exercises[+ex], weekType.key);
+      const status = exerciseStatus(dayNum, currentWeek, +ex, sets.length);
+      const checkEmoji = { done: 'â', partial: 'ð¶', empty: 'â¬' }[status];
+      const exChecks = content.querySelectorAll('.ex-check');
+      if (exChecks[+ex]) {
+        exChecks[+ex].className = `ex-check ${status}`;
+        exChecks[+ex].textContent = checkEmoji;
+      }
+      // Update progress
+      const prog = sessionProgress(dayNum, currentWeek);
+      const pct2 = prog.total > 0 ? Math.round((prog.done / prog.total) * 100) : 0;
+      const fill = document.querySelector('.progress-fill');
+      if (fill) fill.style.width = pct2 + '%';
+      const progLabel = document.querySelector('.progress-row span');
+      if (progLabel) progLabel.textContent = `${prog.done}/${prog.total} sets`;
+    });
+  });
+}
+
+function renderOverview(container) {
+  const card = document.createElement('div');
+  card.className = 'overview-card';
+  card.innerHTML = `<h3>This Week</h3>`;
+
+  const grid = document.createElement('div');
+  grid.className = 'week-grid';
+
+  DAY_ORDER.forEach(dayNum => {
+    const day = DAYS[dayNum];
+    const { done, total } = sessionProgress(dayNum, currentWeek);
+    const cell = document.createElement('div');
+    const dayNames = {2:'TUE',3:'WED',4:'THU',5:'FRI'};
+    cell.className = 'week-day-cell' + (dayNum === currentDayIndex ? ' active-day' : '');
+    cell.innerHTML = `
+      <div class="wdc-day">${dayNames[dayNum]}</div>
+      <div class="wdc-name">${day.label}</div>
+      <div class="wdc-done">${done > 0 ? `${done}/${total}` : 'â'}</div>
+    `;
+    cell.addEventListener('click', () => { currentDayIndex = dayNum; renderAll(); });
+    grid.appendChild(cell);
+  });
+
+  card.appendChild(grid);
+  container.appendChild(card);
+}
+
+function renderAll() {
+  renderHeader();
+  renderDayTabs();
+  renderContent();
+  applyTheme();
+}
+
+// ââ Bottom bar actions ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfJiJxSlQA8rfmuO-O8rym1cDpmO1MrX1mkPzjRNjdRjPJ4VQ/formResponse';
+const FORM_FIELDS = {
+  date:     'entry.701867836',
+  week:     'entry.1751595410',
+  weekType: 'entry.357330990',
+  day:      'entry.2041503879',
+  exercise: 'entry.564646963',
+  set:      'entry.829310765',
+  kg:       'entry.1921799705',
+  reps:     'entry.1659191744',
+  done:     'entry.909239506',
+  notes:    'entry.484661458'
+};
+
+async function pushToSheets() {
+  const dayNum = currentDayIndex;
+  const day = DAYS[dayNum];
+  if (!day) return;
+  const k = logKey(dayNum, currentWeek);
+  const wt = weekType.label;
+  const dateStr = new Date().toLocaleDateString('en-AU');
+
+  // One row per exercise: pack all sets into single fields
+  const submits = day.exercises.map((ex, exIdx) => {
+    const sets = getSetsForEx(ex, weekType.key);
+    const note = logs[k]?.[exIdx]?.note || '';
+    const kgParts   = sets.map((_, sIdx) => logs[k]?.[exIdx]?.sets?.[sIdx]?.weight || '');
+    const repsParts = sets.map((_, sIdx) => logs[k]?.[exIdx]?.sets?.[sIdx]?.reps   || '');
+    const doneParts = sets.map((_, sIdx) => logs[k]?.[exIdx]?.sets?.[sIdx]?.done ? 'Y' : 'N');
+    const doneCount = doneParts.filter(d => d === 'Y').length;
+
+    const row = {
+      date:     dateStr,
+      week:     String(currentWeek),
+      weekType: wt,
+      day:      day.label,
+      exercise: ex.name,
+      set:      kgParts.join(' / '),    // kg per set e.g. "80 / 65 / 50"
+      kg:       repsParts.join(' / '),  // reps per set e.g. "5 / 8 / 15"
+      reps:     doneParts.join(' / '),  // done per set e.g. "Y / Y / N"
+      done:     `${doneCount}/${sets.length}`,
+      notes:    note
+    };
+    const fd = new FormData();
+    Object.entries(FORM_FIELDS).forEach(([key, entryId]) => fd.append(entryId, row[key]));
+    return fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: fd });
+  });
+
+  await Promise.all(submits);
+}
+
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  saveToStorage();
+  showToast('Savingâ¦ ð¾');
+  try {
+    await pushToSheets();
+    showToast('Saved to Google Sheets â');
+  } catch(e) {
+    console.error('Sheets push failed:', e);
+    showToast('Saved locally (Sheets offline) â ï¸');
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (!confirm('Clear all logs for this session?')) return;
+  clearSessionLog(currentDayIndex, currentWeek);
+  renderAll();
+  showToast('Session cleared');
+});
+
+// ââ Theme âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (theme === 'dark') {
+    root.setAttribute('data-theme', 'dark');
+    document.getElementById('themeBtn').textContent = 'âï¸';
+  } else if (theme === 'light') {
+    root.setAttribute('data-theme', 'light');
+    document.getElementById('themeBtn').textContent = 'ð';
+  } else {
+    root.removeAttribute('data-theme');
+    document.getElementById('themeBtn').textContent = 'ð';
+  }
+}
+
+document.getElementById('themeBtn').addEventListener('click', () => {
+  theme = theme === 'system' ? 'dark' : theme === 'dark' ? 'light' : 'system';
+  try { localStorage.setItem('gymlog_theme', theme); } catch(e) {}
+  applyTheme();
+});
+
+// ââ Toast âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+
+loadFromStorage();
+
+const { dow, date } = today();
+currentWeek = getWeekNumber(date);
+if (currentWeek < 1) currentWeek = 1;
+weekType = getWeekType(currentWeek);
+
+// Auto-select today's session if it's a training day, otherwise show Monday
+if ([2, 3, 4, 5].includes(dow)) {
+  currentDayIndex = dow;
+} else {
+  currentDayIndex = 99; // Sat/Sun/Mon rest
+}
+
+renderAll();
+</script>
+</body>
+</html>
