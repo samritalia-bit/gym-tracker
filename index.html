@@ -1248,7 +1248,7 @@ async function pushToSheets() {
   const wt = weekType.label;
   const dateStr = new Date().toLocaleDateString('en-AU');
 
-  // One row per exercise: pack all sets into single fields
+  // One row per exercise (only if at least one set has data): pack all sets into single fields
   const submits = day.exercises.map((ex, exIdx) => {
     const sets = getSetsForEx(ex, weekType.key);
     const note = logs[k]?.[exIdx]?.note || '';
@@ -1256,6 +1256,10 @@ async function pushToSheets() {
     const repsParts = sets.map((_, sIdx) => logs[k]?.[exIdx]?.sets?.[sIdx]?.reps   || '');
     const doneParts = sets.map((_, sIdx) => logs[k]?.[exIdx]?.sets?.[sIdx]?.done ? 'Y' : 'N');
     const doneCount = doneParts.filter(d => d === 'Y').length;
+
+    // Skip if no data entered at all
+    const hasData = kgParts.some(v => v !== '') || repsParts.some(v => v !== '') || doneCount > 0;
+    if (!hasData) return null;
 
     const row = {
       date:     dateStr,
@@ -1272,7 +1276,7 @@ async function pushToSheets() {
     const fd = new FormData();
     Object.entries(FORM_FIELDS).forEach(([key, entryId]) => fd.append(entryId, row[key]));
     return fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: fd });
-  });
+  }).filter(Boolean);
 
   await Promise.all(submits);
 }
