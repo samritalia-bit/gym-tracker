@@ -94,7 +94,7 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* ââ Header ââ */
+  /* ── Header ── */
   .hdr {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
@@ -148,7 +148,7 @@
     margin-left: auto;
   }
 
-  /* ââ Day tabs ââ */
+  /* ── Day tabs ── */
   .day-tabs {
     display: flex;
     background: var(--bg2);
@@ -179,7 +179,7 @@
   .day-tab .day-name { display: block; font-size: 11px; }
   .day-tab .day-label { display: block; font-size: 13px; }
 
-  /* ââ Main content ââ */
+  /* ── Main content ── */
   .content {
     flex: 1;
     padding: 16px 16px 80px;
@@ -188,7 +188,7 @@
     gap: 14px;
   }
 
-  /* ââ Rest day ââ */
+  /* ── Rest day ── */
   .rest-card {
     background: var(--bg2);
     border-radius: 16px;
@@ -200,7 +200,7 @@
   .rest-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
   .rest-card p { color: var(--fg2); font-size: 14px; }
 
-  /* ââ Session header ââ */
+  /* ── Session header ── */
   .session-hdr {
     background: var(--bg2);
     border-radius: 16px;
@@ -227,7 +227,7 @@
   .session-info h2 { font-size: 17px; font-weight: 700; }
   .session-info p  { font-size: 12px; color: var(--fg2); margin-top: 2px; }
 
-  /* ââ Progress bar ââ */
+  /* ── Progress bar ── */
   .progress-row {
     display: flex;
     align-items: center;
@@ -249,7 +249,7 @@
     transition: width 0.3s ease;
   }
 
-  /* ââ Exercise card ââ */
+  /* ── Exercise card ── */
   .exercise-card {
     background: var(--bg2);
     border-radius: 16px;
@@ -380,7 +380,7 @@
     font-style: italic;
   }
 
-  /* ââ Per-exercise notes ââ */
+  /* ── Per-exercise notes ── */
   .notes-toggle {
     display: inline-flex;
     align-items: center;
@@ -419,7 +419,7 @@
   }
   .notes-area::placeholder { color: var(--fg3); }
 
-  /* ââ Straight sets note ââ */
+  /* ── Straight sets note ── */
   .straight-note {
     font-size: 11px;
     font-weight: 600;
@@ -432,7 +432,7 @@
     margin-bottom: 8px;
   }
 
-  /* ââ Bottom bar ââ */
+  /* ── Bottom bar ── */
   .bottom-bar {
     position: fixed;
     bottom: 0;
@@ -469,7 +469,7 @@
     color: var(--fg);
   }
 
-  /* ââ Toast ââ */
+  /* ── Toast ── */
   .toast {
     position: fixed;
     bottom: 90px;
@@ -492,7 +492,7 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ââ Week overview ââ */
+  /* ── Week overview ── */
   .overview-card {
     background: var(--bg2);
     border-radius: 16px;
@@ -529,7 +529,7 @@
   .week-day-cell .wdc-name { font-size: 12px; font-weight: 700; color: var(--fg); margin-top: 3px; }
   .week-day-cell .wdc-done { font-size: 10px; color: var(--fg3); margin-top: 2px; }
 
-  /* ââ Theme toggle ââ */
+  /* ── Theme toggle ── */
   .theme-btn {
     width: 34px;
     height: 34px;
@@ -544,7 +544,7 @@
     justify-content: center;
   }
 
-  /* ââ History view ââ */
+  /* ── History view ── */
   .history-card {
     background: var(--bg2);
     border-radius: 16px;
@@ -581,10 +581,10 @@
   <div class="hdr">
     <div class="hdr-top">
       <div class="hdr-title">GYM<span>LOG</span></div>
-      <button class="theme-btn" id="themeBtn" title="Toggle theme">âï¸</button>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">☀️</button>
     </div>
     <div class="week-strip">
-      <span id="weekBadge" class="week-badge strength">â¡ Strength</span>
+      <span id="weekBadge" class="week-badge strength">⚡ Strength</span>
       <span id="weekNum" class="week-num">Week 1</span>
       <span id="dateLabel" class="date-label">Mon, 6 Oct</span>
     </div>
@@ -596,27 +596,27 @@
 
   <div class="bottom-bar" id="bottomBar" style="display:none">
     <button class="btn btn-ghost" id="clearBtn">Clear</button>
-    <button class="btn btn-primary" id="saveBtn">ð¾ Save Session</button>
+    <button class="btn btn-primary" id="saveBtn">💾 Save Session</button>
   </div>
 
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
-// ââ Program Data ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Program Data ──────────────────────────────────────────────────────────────
 
 const START_DATE = new Date('2026-10-06T00:00:00'); // Monday 6 Oct 2026
 
 // Week types cycle: Strength, Hypertrophy, Volume, Deload, then repeat (wk 9 = Strength, wk 12 = Test)
 function getWeekType(weekNum) {
-  if (weekNum === 12) return { label: 'Test Week', key: 'test', emoji: 'ð' };
-  if (weekNum === 8)  return { label: 'Deload',    key: 'deload', emoji: 'ð´' };
+  if (weekNum === 12) return { label: 'Test Week', key: 'test', emoji: '🏆' };
+  if (weekNum === 8)  return { label: 'Deload',    key: 'deload', emoji: '😴' };
   const cycle = (weekNum - 1) % 4;
   return [
-    { label: 'Strength',    key: 'strength',    emoji: 'â¡' },
-    { label: 'Hypertrophy', key: 'hypertrophy', emoji: 'ðª' },
-    { label: 'Volume',      key: 'volume',       emoji: 'ð¥' },
-    { label: 'Deload',      key: 'deload',       emoji: 'ð´' },
+    { label: 'Strength',    key: 'strength',    emoji: '⚡' },
+    { label: 'Hypertrophy', key: 'hypertrophy', emoji: '💪' },
+    { label: 'Volume',      key: 'volume',       emoji: '🔥' },
+    { label: 'Deload',      key: 'deload',       emoji: '😴' },
   ][cycle];
 }
 
@@ -626,17 +626,17 @@ function getSets(weekType, base) {
   const deload = weekType === 'deload';
   const test   = weekType === 'test';
   if (deload) return [
-    { label: 'Set 1', reps: '5â6',   kg: Math.round(heavy * 0.7), note: 'Deload heavy' },
-    { label: 'Set 2', reps: '8â10',  kg: Math.round(mod * 0.7),   note: 'Deload moderate' },
-    { label: 'Set 3', reps: '15â20', kg: Math.round(light * 0.7), note: 'Deload light' },
+    { label: 'Set 1', reps: '5–6',   kg: Math.round(heavy * 0.7), note: 'Deload heavy' },
+    { label: 'Set 2', reps: '8–10',  kg: Math.round(mod * 0.7),   note: 'Deload moderate' },
+    { label: 'Set 3', reps: '15–20', kg: Math.round(light * 0.7), note: 'Deload light' },
   ];
   if (test) return [
-    { label: 'Set 1', reps: '1â3', kg: heavy, note: 'Test max â warm up well' },
+    { label: 'Set 1', reps: '1–3', kg: heavy, note: 'Test max — warm up well' },
   ];
   const repsMap = {
-    strength:    ['5â6', '8â10', '15â20'],
-    hypertrophy: ['6â8', '10â12', '15â20'],
-    volume:      ['8â10', '12â15', '20â25'],
+    strength:    ['5–6', '8–10', '15–20'],
+    hypertrophy: ['6–8', '10–12', '15–20'],
+    volume:      ['8–10', '12–15', '20–25'],
   };
   const [r1, r2, r3] = repsMap[weekType] || repsMap.strength;
   return [
@@ -657,23 +657,23 @@ const DAYS = {
   2: { // Tuesday
     key: 'push',
     label: 'Push',
-    emoji: 'ð¼',
+    emoji: '🔼',
     style: 'push',
-    subtitle: 'Chest Â· Shoulders Â· Triceps',
+    subtitle: 'Chest · Shoulders · Triceps',
     exercises: [
       {
         name: 'Chest Press Machine',
         sub: 'Chest compound',
         pyramid: true,
         base: { heavy: 80, mod: 65, light: 50 },
-        cue: 'Elbows tucked 45Â°. Chest-led press. Full range â don\'t bounce off the stack.'
+        cue: 'Elbows tucked 45°. Chest-led press. Full range — don\'t bounce off the stack.'
       },
       {
         name: 'Incline DB Press',
         sub: 'Upper chest',
         pyramid: true,
         base: { heavy: 32, mod: 26, light: 20 },
-        cue: '30â45Â° incline. Twist pinkies together at top. Full stretch at bottom.'
+        cue: '30–45° incline. Twist pinkies together at top. Full stretch at bottom.'
       },
       {
         name: 'Cable Lateral Raise (Single Arm)',
@@ -694,37 +694,37 @@ const DAYS = {
         sub: 'Triceps long head',
         pyramid: true,
         base: { heavy: 40, mod: 32, light: 24 },
-        cue: 'Elbows tucked in. Bar to neckline. Hybrid press/extension â great long head hit.'
+        cue: 'Elbows tucked in. Bar to neckline. Hybrid press/extension — great long head hit.'
       },
       {
         name: 'Seated Barbell Front Raise',
-        sub: 'Anterior delt Â· Upper chest',
+        sub: 'Anterior delt · Upper chest',
         pyramid: true,
         base: { heavy: 20, mod: 16, light: 12 },
-        cue: 'Sit upright, barbell in both hands. Drive bar up to shoulder height with a controlled swing. Front delts do the work â let the momentum assist, don\'t muscle it with your back.'
+        cue: 'Sit upright, barbell in both hands. Drive bar up to shoulder height with a controlled swing. Front delts do the work — let the momentum assist, don\'t muscle it with your back.'
       },
     ]
   },
   3: { // Wednesday
     key: 'pull',
     label: 'Pull',
-    emoji: 'ð½',
+    emoji: '🔽',
     style: 'pull',
-    subtitle: 'Back Â· Rear Delts Â· Biceps',
+    subtitle: 'Back · Rear Delts · Biceps',
     exercises: [
       {
         name: 'Rack Pull (Below Knee)',
-        sub: 'Back compound â heavy',
+        sub: 'Back compound — heavy',
         pyramid: true,
         base: { heavy: 120, mod: 100, light: 80 },
-        cue: 'Brace hard. Push floor away. Drive hips through at lockout. 2 min rest every set â non-negotiable.'
+        cue: 'Brace hard. Push floor away. Drive hips through at lockout. 2 min rest every set — non-negotiable.'
       },
       {
         name: 'Bent Over Row (Barbell)',
-        sub: 'Mid-back Â· Rhomboids',
+        sub: 'Mid-back · Rhomboids',
         pyramid: true,
         base: { heavy: 80, mod: 65, light: 50 },
-        cue: 'Overhand grip. Hinge 45Â°. Pull bar to lower chest. Drive elbows back hard. Chest up throughout.'
+        cue: 'Overhand grip. Hinge 45°. Pull bar to lower chest. Drive elbows back hard. Chest up throughout.'
       },
       {
         name: 'Lat Pulldown (Wide Grip)',
@@ -735,7 +735,7 @@ const DAYS = {
       },
       {
         name: 'Seated Cable Row (V-Grip)',
-        sub: 'Mid-back Â· Traps',
+        sub: 'Mid-back · Traps',
         pyramid: true,
         base: { heavy: 72, mod: 60, light: 48 },
         cue: 'Chest up. Pull to lower abs. Tuck head going forward. Squeeze shoulder blades at peak.'
@@ -752,9 +752,9 @@ const DAYS = {
   4: { // Thursday
     key: 'legs',
     label: 'Legs+Abs',
-    emoji: 'ð¦µ',
+    emoji: '🦵',
     style: 'legs',
-    subtitle: 'Quads Â· Hamstrings Â· Glutes Â· Abs',
+    subtitle: 'Quads · Hamstrings · Glutes · Abs',
     exercises: [
       {
         name: 'Squat (Barbell)',
@@ -768,18 +768,18 @@ const DAYS = {
         sub: 'Quads compound',
         pyramid: true,
         base: { heavy: 240, mod: 180, light: 130 },
-        cue: 'Knee sleeve on. 90Â° depth max every rep. Feet shoulder-width, mid-plate. Don\'t lock out fully.'
+        cue: 'Knee sleeve on. 90° depth max every rep. Feet shoulder-width, mid-plate. Don\'t lock out fully.'
       },
       {
         name: 'Leg Extension',
         sub: 'Quad isolation',
         pyramid: true,
         base: { heavy: 80, mod: 65, light: 50 },
-        cue: 'Full extension at top â squeeze quads hard. Slow controlled descent. Isolates quads completely.'
+        cue: 'Full extension at top — squeeze quads hard. Slow controlled descent. Isolates quads completely.'
       },
       {
         name: 'Romanian Deadlift (DB)',
-        sub: 'Hamstrings Â· Glutes',
+        sub: 'Hamstrings · Glutes',
         pyramid: true,
         base: { heavy: 32, mod: 26, light: 20 },
         cue: 'Soft knee bend. Hinge hips back. Feel hamstring stretch all the way down. Squeeze glutes at top.'
@@ -793,9 +793,9 @@ const DAYS = {
       },
       {
         name: 'Cable Crunch',
-        sub: 'Abs finisher Â· Straight sets',
+        sub: 'Abs finisher · Straight sets',
         pyramid: false,
-        straight: { reps: '15â20', kg: 25, count: 3 },
+        straight: { reps: '15–20', kg: 25, count: 3 },
         cue: 'Rope overhead. Crunch down toward knees. Squeeze abs hard at bottom. Controlled return.'
       },
     ]
@@ -803,13 +803,13 @@ const DAYS = {
   5: { // Friday
     key: 'arms',
     label: 'Arms',
-    emoji: 'ðª',
+    emoji: '💪',
     style: 'arms',
-    subtitle: 'Biceps Â· Triceps Â· Forearms',
+    subtitle: 'Biceps · Triceps · Forearms',
     exercises: [
       {
         name: 'EZ Bar Curl',
-        sub: 'Biceps â heavy compound',
+        sub: 'Biceps — heavy compound',
         pyramid: true,
         base: { heavy: 40, mod: 32, light: 24 },
         cue: 'Anchor elbows at sides. No swinging. Full range every rep. Log weight every session.'
@@ -819,14 +819,14 @@ const DAYS = {
         sub: 'Triceps long head',
         pyramid: true,
         base: { heavy: 36, mod: 28, light: 20 },
-        cue: 'Bar to forehead. Elbows point at ceiling. Full extension at top. Slow eccentric â don\'t rush.'
+        cue: 'Bar to forehead. Elbows point at ceiling. Full extension at top. Slow eccentric — don\'t rush.'
       },
       {
         name: 'Incline DB Curl',
         sub: 'Biceps long head stretch',
         pyramid: true,
         base: { heavy: 16, mod: 13, light: 10 },
-        cue: '45Â° incline â arms hang fully. Great long-head stretch at bottom. Twist and squeeze at top.'
+        cue: '45° incline — arms hang fully. Great long-head stretch at bottom. Twist and squeeze at top.'
       },
       {
         name: 'Rope Pushdown',
@@ -837,14 +837,14 @@ const DAYS = {
       },
       {
         name: 'Cable Hammer Curl',
-        sub: 'Brachialis Â· Forearms',
+        sub: 'Brachialis · Forearms',
         pyramid: true,
         base: { heavy: 20, mod: 16, light: 12 },
         cue: 'Neutral grip. Twist out at bottom, twist in at top. Ring hold lightly. Controlled tempo.'
       },
       {
         name: 'Overhead Tricep Ext (Cable)',
-        sub: 'Triceps long head â finisher',
+        sub: 'Triceps long head — finisher',
         pyramid: true,
         base: { heavy: 28, mod: 22, light: 16 },
         cue: 'Arms behind head, elbows locked in. Full extension overhead. Long head gets maximum stretch here.'
@@ -855,7 +855,7 @@ const DAYS = {
 
 const DAY_ORDER = [2, 3, 4, 5]; // Tue, Wed, Thu, Fri
 
-// ââ State âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── State ─────────────────────────────────────────────────────────────────────
 
 let currentDayIndex = null; // day-of-week 0=Sun..6=Sat
 let currentWeek = 1;
@@ -863,7 +863,7 @@ let weekType = null;
 let logs = {}; // { [dayKey_weekKey]: { [exerciseIndex]: { sets: [{weight,reps,done}] } } }
 let theme = 'system';
 
-// ââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function today() {
   const now = new Date();
@@ -942,7 +942,7 @@ function getSetsForEx(ex, wt) {
   return getSets(wt, ex.base);
 }
 
-// ââ Persistence âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Persistence ───────────────────────────────────────────────────────────────
 
 function saveToStorage() {
   try { localStorage.setItem('gymlog_logs', JSON.stringify(logs)); } catch(e) {}
@@ -957,7 +957,7 @@ function loadFromStorage() {
   } catch(e) {}
 }
 
-// ââ Rendering âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Rendering ─────────────────────────────────────────────────────────────────
 
 function renderDayTabs() {
   const tabs = document.getElementById('dayTabs');
@@ -1010,7 +1010,7 @@ function renderContent() {
     const card = document.createElement('div');
     card.className = 'rest-card';
     card.innerHTML = `
-      <div class="rest-icon">ð´</div>
+      <div class="rest-icon">😴</div>
       <h2>Rest Day</h2>
       <p>Recovery is where the gains happen. Eat well, sleep well, and come back stronger.</p>
     `;
@@ -1050,7 +1050,7 @@ function renderContent() {
   day.exercises.forEach((ex, exIdx) => {
     const sets = getSetsForEx(ex, weekType.key);
     const status = exerciseStatus(dayNum, currentWeek, exIdx, sets.length);
-    const checkEmoji = { done: 'â', partial: 'ð¶', empty: 'â¬' }[status];
+    const checkEmoji = { done: '✅', partial: '🔶', empty: '⬜' }[status];
 
     const card = document.createElement('div');
     card.className = 'exercise-card';
@@ -1079,7 +1079,7 @@ function renderContent() {
         <div>Set</div>
         <div>kg</div>
         <div>Reps</div>
-        <div>â</div>
+        <div>✓</div>
       </div>
     `;
 
@@ -1095,20 +1095,20 @@ function renderContent() {
         <div class="set-label">${set.label}<small>${set.note}</small></div>
         <input class="set-input${wt ? ' filled' : ''}" type="number" inputmode="decimal" placeholder="${set.kg}kg" value="${wt}" data-ex="${exIdx}" data-set="${sIdx}" data-field="weight">
         <input class="set-input${reps ? ' filled' : ''}" type="number" inputmode="numeric" placeholder="${set.reps}" value="${reps}" data-ex="${exIdx}" data-set="${sIdx}" data-field="reps">
-        <div class="set-tick${isDone ? ' done' : ''}" data-ex="${exIdx}" data-set="${sIdx}">${isDone ? 'â' : ''}</div>
+        <div class="set-tick${isDone ? ' done' : ''}" data-ex="${exIdx}" data-set="${sIdx}">${isDone ? '✓' : ''}</div>
       `;
       body.appendChild(row);
     });
 
     // Cue moved into editable notes field below
 
-    // Per-exercise notes â pre-filled with cue, editable, persisted
+    // Per-exercise notes — pre-filled with cue, editable, persisted
     const savedNote = logs[logKey(dayNum, currentWeek)]?.[exIdx]?.note ?? ex.cue;
     const hasCustomNote = logs[logKey(dayNum, currentWeek)]?.[exIdx]?.note !== undefined;
     const notesWrap = document.createElement('div');
     notesWrap.innerHTML = `
-      <button class="notes-toggle" data-ex="${exIdx}">ð Notes${hasCustomNote && savedNote !== ex.cue ? ' â' : ''}</button>
-      <textarea class="notes-area" data-ex="${exIdx}" placeholder="Add notesâ¦" style="display:none">${savedNote}</textarea>
+      <button class="notes-toggle" data-ex="${exIdx}">📝 Notes${hasCustomNote && savedNote !== ex.cue ? ' ●' : ''}</button>
+      <textarea class="notes-area" data-ex="${exIdx}" placeholder="Add notes…" style="display:none">${savedNote}</textarea>
     `;
     body.appendChild(notesWrap);
 
@@ -1117,7 +1117,7 @@ function renderContent() {
     content.appendChild(card);
 
     // Toggle body on header click (collapsed by default on small screens is handled via the header click)
-    // Actually keep all expanded â mobile-first full view
+    // Actually keep all expanded — mobile-first full view
   });
 
   // Bottom bar
@@ -1159,7 +1159,7 @@ function renderContent() {
       saveToStorage();
       // Update dot indicator when edited away from default cue
       const defaultCue = day.exercises[exIdx]?.cue || '';
-      btn.textContent = `ð Notes${e.target.value && e.target.value !== defaultCue ? ' â' : ''}`;
+      btn.textContent = `📝 Notes${e.target.value && e.target.value !== defaultCue ? ' ●' : ''}`;
     });
   });
 
@@ -1169,11 +1169,11 @@ function renderContent() {
       toggleSetDone(dayNum, currentWeek, +ex, +set);
       const isDone = !!logs[logKey(dayNum, currentWeek)]?.[+ex]?.sets?.[+set]?.done;
       tick.classList.toggle('done', isDone);
-      tick.textContent = isDone ? 'â' : '';
+      tick.textContent = isDone ? '✓' : '';
       // Update exercise status icon
       const sets = getSetsForEx(day.exercises[+ex], weekType.key);
       const status = exerciseStatus(dayNum, currentWeek, +ex, sets.length);
-      const checkEmoji = { done: 'â', partial: 'ð¶', empty: 'â¬' }[status];
+      const checkEmoji = { done: '✅', partial: '🔶', empty: '⬜' }[status];
       const exChecks = content.querySelectorAll('.ex-check');
       if (exChecks[+ex]) {
         exChecks[+ex].className = `ex-check ${status}`;
@@ -1207,7 +1207,7 @@ function renderOverview(container) {
     cell.innerHTML = `
       <div class="wdc-day">${dayNames[dayNum]}</div>
       <div class="wdc-name">${day.label}</div>
-      <div class="wdc-done">${done > 0 ? `${done}/${total}` : 'â'}</div>
+      <div class="wdc-done">${done > 0 ? `${done}/${total}` : '—'}</div>
     `;
     cell.addEventListener('click', () => { currentDayIndex = dayNum; renderAll(); });
     grid.appendChild(cell);
@@ -1224,7 +1224,7 @@ function renderAll() {
   applyTheme();
 }
 
-// ââ Bottom bar actions ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Bottom bar actions ────────────────────────────────────────────────────────
 
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfJiJxSlQA8rfmuO-O8rym1cDpmO1MrX1mkPzjRNjdRjPJ4VQ/formResponse';
 const FORM_FIELDS = {
@@ -1279,13 +1279,13 @@ async function pushToSheets() {
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
   saveToStorage();
-  showToast('Savingâ¦ ð¾');
+  showToast('Saving… 💾');
   try {
     await pushToSheets();
-    showToast('Saved to Google Sheets â');
+    showToast('Saved to Google Sheets ✅');
   } catch(e) {
     console.error('Sheets push failed:', e);
-    showToast('Saved locally (Sheets offline) â ï¸');
+    showToast('Saved locally (Sheets offline) ⚠️');
   }
 });
 
@@ -1296,19 +1296,19 @@ document.getElementById('clearBtn').addEventListener('click', () => {
   showToast('Session cleared');
 });
 
-// ââ Theme âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Theme ─────────────────────────────────────────────────────────────────────
 
 function applyTheme() {
   const root = document.documentElement;
   if (theme === 'dark') {
     root.setAttribute('data-theme', 'dark');
-    document.getElementById('themeBtn').textContent = 'âï¸';
+    document.getElementById('themeBtn').textContent = '☀️';
   } else if (theme === 'light') {
     root.setAttribute('data-theme', 'light');
-    document.getElementById('themeBtn').textContent = 'ð';
+    document.getElementById('themeBtn').textContent = '🌙';
   } else {
     root.removeAttribute('data-theme');
-    document.getElementById('themeBtn').textContent = 'ð';
+    document.getElementById('themeBtn').textContent = '🌓';
   }
 }
 
@@ -1318,7 +1318,7 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   applyTheme();
 });
 
-// ââ Toast âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Toast ─────────────────────────────────────────────────────────────────────
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1327,7 +1327,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ââ Init ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ── Init ──────────────────────────────────────────────────────────────────────
 
 loadFromStorage();
 
